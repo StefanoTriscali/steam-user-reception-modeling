@@ -73,12 +73,12 @@ The project compares several regression models:
 
 ## Results
 
-| Model                              |   RMSE |    MAE |     R² |
-| ---------------------------------- | -----: | -----: | -----: |
-| Dummy mean                         | 21.035 | 15.585 | -0.000 |
-| XGB numeric only                   | 19.025 | 13.893 |  0.182 |
-| XGB + Genres/Categories            | 17.974 | 13.115 |  0.270 |
-| Final XGB + Genres/Categories/Tags | 17.379 | 12.608 |  0.317 |
+| Model | RMSE | MAE | R² |
+|---|---:|---:|---:|
+| Dummy mean | 21.035 | 15.585 | -0.000 |
+| XGB numeric only | 19.025 | 13.893 | 0.182 |
+| XGB + Genres/Categories | 17.974 | 13.115 | 0.270 |
+| Final XGB + Genres/Categories/Tags | 17.379 | 12.608 | 0.317 |
 
 The final model improves over both the naive baseline and the numerical-only model. The strongest performance is achieved by combining numerical post-release indicators with multilabel categorical metadata, especially Tags.
 

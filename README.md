@@ -178,3 +178,7 @@ Possible future improvements include:
 ## Author
 
 Stefano Triscali
+
+## License
+
+This project is released under the MIT License.

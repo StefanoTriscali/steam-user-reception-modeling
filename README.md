@@ -1,180 +1,238 @@
-# Steam User Reception Modeling
+---
+title: "Steam User Reception Modeling"
+author: "Stefano Triscali"
+date: "July 2026"
+geometry: margin=1in
+colorlinks: true
+linkcolor: blue
+urlcolor: blue
+toc: false
+---
 
-This project models Steam game user reception using game metadata, post-release engagement indicators and multilabel categorical metadata such as Genres, Categories and Tags.
+# Overview
 
-The target variable is a Bayesian-smoothed review reception score derived from Steam positive and negative review counts. The smoothing step reduces instability for games with very few reviews.
+This project investigates whether Steam game metadata, post-release engagement signals and multilabel categorical metadata can be used to predict user reception.
 
-> Important: this is a post-release reception modeling project, not a pre-release success forecasting model, because several predictors such as estimated owners, playtime and Peak CCU are observed after release.
+The analysis is framed as a supervised regression problem. The target is a Bayesian-smoothed review reception score constructed from Steam positive and negative review counts.
 
-## Project goal
+> **Important:** this is a post-release reception modeling project, not a pre-release success forecasting model. Several predictors, including estimated ownership, playtime and Peak CCU, are observed only after release.
 
-The goal is to answer the following question:
+# Research question
 
-> Can Steam game metadata and post-release engagement signals predict user reception?
+> Can Steam game metadata and post-release engagement signals be used to predict user reception?
 
-The project focuses on predictive modeling, feature engineering, model comparison and error analysis.
+# Main results
 
-## Dataset
+The final model is an XGBoost regressor trained using numerical metadata, Genres, Categories and Steam Tags.
 
-The project uses a cleaned Steam games dataset downloaded through KaggleHub.
+| Model | RMSE | MAE | R2 |
+|---|---:|---:|---:|
+| Dummy mean | 21.035 | 15.585 | 0.000 |
+| XGBoost - numerical only | 19.025 | 13.893 | 0.182 |
+| XGBoost + Genres/Categories | 17.974 | 13.115 | 0.270 |
+| Final XGBoost + Genres/Categories/Tags | **17.379** | **12.608** | **0.317** |
 
-The dataset includes game-level information such as pricing, release date, estimated owners, playtime indicators, concurrent user activity, review counts and multilabel categorical metadata.
+Within the numerical-only comparison, XGBoost also achieved a lower cross-validated RMSE than Ridge and Lasso, supporting the use of a non-linear model for the subsequent feature-extension stages.
 
-Main feature groups include:
+# Key findings
 
-* Numerical metadata and engagement indicators
-* Estimated ownership
-* Release year and release month
-* Average and median playtime
-* Peak concurrent users
-* Genres
-* Categories
-* Tags
+- Numerical post-release indicators contain meaningful predictive signal.
+- XGBoost outperforms the regularized linear baselines.
+- Genres and Categories improve performance over numerical features alone.
+- Steam Tags provide the strongest additional categorical improvement.
+- `release_year`, Peak CCU, average playtime, reconstructed original price and estimated ownership are among the most influential predictors according to permutation importance.
+- The final model tends to regress toward the mean, overestimating poorly received games and underestimating highly received games.
 
-## Target variable
+The results suggest that structured Steam metadata can capture broad patterns in user reception, but cannot fully explain extreme positive or negative outcomes.
 
-The raw review score is computed as:
+## Selected figures
 
-```
+### Target construction
+
+The Bayesian smoothing procedure reduces the concentration of extreme scores
+for games with very few reviews.
+
+<p align="center">
+  <img src="reports/figures/Raw_Vs_Bayesian_review_score_distr.png"
+       alt="Raw and Bayesian-smoothed review score distributions"
+       width="750">
+</p>
+
+### Model interpretation
+
+Permutation importance shows that the final model relies on both numerical
+post-release signals and multilabel metadata.
+
+<p align="center">
+  <img src="reports/figures/Top_20_permutation_importance_XGB.png"
+       alt="Permutation importance"
+       width="750">
+</p>
+
+### Error analysis
+
+The model tends to overestimate poorly received games and underestimate highly
+received games.
+
+<p align="center">
+  <img src="reports/figures/error_by_quintile.png"
+       alt="Mean signed error by reception quintile"
+       width="750">
+</p>
+
+# Dataset
+
+The project is based on the [Steam Games Dataset](https://www.kaggle.com/datasets/fronkongames/steam-games-dataset).
+
+A cleaned and reproducible version of the dataset is available here:
+
+[Steam Dataset 2026 Cleaned](https://www.kaggle.com/datasets/stefanotriscali/steam-database-2026-fixed)
+
+After excluding games without reviews, the modeling dataset contains 82,766 observations.
+
+The dataset includes:
+
+- pricing and release information;
+- estimated ownership;
+- average and median playtime;
+- Peak CCU;
+- Genres;
+- Categories;
+- Steam Tags;
+- positive and negative review counts.
+
+The review-count variables are used exclusively to construct the target and are excluded from the predictive feature set to prevent target leakage.
+
+# Target construction
+
+The raw review score is defined as:
+
+```text
 (Positive - Negative) / (Positive + Negative) * 100
 ```
 
-This produces a score between -100 and 100.
+The score ranges from -100 to 100. However, raw scores can be unstable for games with very few reviews.
 
-However, raw review scores can be unstable for games with very few reviews. To reduce this issue, the final regression target is a Bayesian-smoothed review reception score. Games with fewer reviews are shrunk more strongly toward the global average, while games with many reviews remain closer to their raw score.
+To address this issue, the project applies a Bayesian smoothing procedure inspired by the IMDb weighted-rating approach. Games with fewer reviews are shrunk more strongly toward the global review balance, while games with many reviews remain closer to their observed raw score.
 
-## Methodology
+The final regression target is:
 
-The workflow includes:
-
-1. Dataset loading and cleaning
-2. Feature engineering
-3. Bayesian-smoothed target construction
-4. Fixed train/test split
-5. Numerical baseline models
-6. Multilabel encoding of Genres and Categories
-7. Tags extension
-8. Feature block selection using training-set cross-validation
-9. Final XGBoost tuning with GridSearchCV
-10. Held-out test evaluation
-11. Feature importance and permutation importance
-12. Error analysis
-
-## Models
-
-The project compares several regression models:
-
-* DummyRegressor as a naive baseline
-* Ridge regression
-* Lasso regression
-* XGBoost using numerical features only
-* XGBoost with Genres and Categories
-* Final tuned XGBoost with numerical features, Genres, Categories and Tags
-
-## Results
-
-| Model | RMSE | MAE | R² |
-|---|---:|---:|---:|
-| Dummy mean | 21.035 | 15.585 | -0.000 |
-| XGB numeric only | 19.025 | 13.893 | 0.182 |
-| XGB + Genres/Categories | 17.974 | 13.115 | 0.270 |
-| Final XGB + Genres/Categories/Tags | 17.379 | 12.608 | 0.317 |
-
-The final model improves over both the naive baseline and the numerical-only model. The strongest performance is achieved by combining numerical post-release indicators with multilabel categorical metadata, especially Tags.
-
-## Key findings
-
-Adding Genres and Categories improves performance compared to numerical features alone.
-
-Adding Tags provides a further improvement, suggesting that granular descriptors of gameplay style, mechanics, themes and audience expectations contain useful predictive information.
-
-XGBoost outperforms the regularized linear baselines, suggesting that the relationship between Steam metadata and user reception is partly non-linear.
-
-The final model still tends to regress toward the mean. It tends to overestimate poorly received games and underestimate highly received games.
-
-## Error analysis
-
-The error analysis shows that aggregate metrics such as RMSE and MAE do not fully describe model behavior.
-
-The model performs better around the central part of the target distribution, while extreme reception outcomes remain harder to predict. This suggests that metadata and engagement indicators are informative, but not sufficient to fully explain very negative or very positive user reception.
-
-## Interpretation
-
-Feature importance and permutation importance are used to understand which variables contribute most to the final model.
-
-The interpretation should be read as predictive, not causal. A feature being important for prediction does not imply that it directly causes higher or lower user reception.
-
-## Limitations
-
-This project is predictive, not causal.
-
-It should not be used as a pre-release success forecasting model, since several predictors are only available after release.
-
-The model does not include potentially relevant information such as:
-
-* Review text sentiment
-* Bug reports
-* Update history
-* Developer and publisher reputation
-* Community sentiment
-* Marketing exposure
-* Wishlist data
-* External social media signals
-
-The target is also based on Steam review counts, which may reflect user behavior, visibility and platform dynamics in addition to game quality.
-
-## Repository structure
-
+```text
+review_score_bayes
 ```
+
+# Methodology
+
+The workflow consists of:
+
+1. loading the cleaned Steam dataset;
+2. filtering games without review information;
+3. constructing the raw and Bayesian-smoothed targets;
+4. engineering numerical features;
+5. creating a fixed 80/20 train-test split;
+6. comparing Dummy, Ridge, Lasso and numerical-only XGBoost models;
+7. encoding Genres and Categories as multilabel binary features;
+8. extending the feature space with Steam Tags;
+9. selecting feature blocks through training-set cross-validation;
+10. tuning the final XGBoost model with `GridSearchCV`;
+11. evaluating the selected model on the held-out test set;
+12. performing permutation importance and error analysis.
+
+No model-selection, feature-selection or hyperparameter-selection decision is based on held-out test performance.
+
+# Model interpretation
+
+Permutation importance is used to measure the increase in RMSE produced by shuffling each feature while leaving the remaining predictors unchanged.
+
+The results show that the final model uses both numerical engagement signals and multilabel metadata. The importance values should be interpreted as measures of predictive usefulness rather than causal effects.
+
+# Error analysis
+
+The model performs best around the central portion of the target distribution.
+
+Mean signed prediction errors show a clear regression-to-the-mean pattern:
+
+- games in the lowest reception quintile are substantially overestimated;
+- games in the highest reception quintile are underestimated;
+- predictions are better centered for games with intermediate reception.
+
+This suggests that extreme reception may depend on qualitative or contextual information not represented in the structured dataset.
+
+# Limitations
+
+- The analysis is predictive, not causal.
+- The model cannot be used for pre-release forecasting.
+- The target is NPS-inspired but is not a true survey-based Net Promoter Score.
+- Steam reviews are self-selected and may not represent the full player base.
+- Tags may reflect community perceptions and platform conventions rather than objective game characteristics.
+- The dataset does not include review text, bug reports, update history, marketing exposure, wishlist data, developer reputation or external community sentiment.
+
+# Repository structure
+
+```text
 steam-user-reception-modeling/
-├── notebooks/
-│   └── steam_user_reception_modeling.ipynb
-├── reports/
-│   └── figures/
-├── src/
-│   ├── features.py
-│   └── evaluation.py
-├── models/
-│   └── README.md
-├── README.md
-├── requirements.txt
-└── .gitignore
+|-- notebooks/
+|   `-- steam_user_reception_modeling.ipynb
+|-- reports/
+|   |-- steam_user_reception_technical_report.pdf
+|   `-- figures/
+|       |-- raw_vs_bayesian_review_score.png
+|       |-- permutation_importance.png
+|       |-- predicted_vs_actual.png
+|       |-- error_by_reception_quintile.png
+|-- README.md
+|-- requirements.txt
+`-- .gitignore
 ```
 
-## How to run
+# Technical report
 
-Install dependencies:
+The complete technical report is available here:
 
-```
+[Read the technical report](reports/steam_user_reception_technical_report.pdf)
+
+# How to run
+
+Clone the repository and install the required packages:
+
+```bash
+git clone https://github.com/StefanoTriscali/steam-user-reception-modeling.git
+cd steam-user-reception-modeling
 pip install -r requirements.txt
 ```
 
-Then open and run the notebook:
+Then open:
 
-```
+```text
 notebooks/steam_user_reception_modeling.ipynb
 ```
 
-The notebook downloads the dataset using KaggleHub.
+The notebook downloads the cleaned dataset through KaggleHub. Kaggle credentials may be required depending on the execution environment.
 
-## Project status
+# Reproducibility
 
-This project is complete as a modeling notebook and portfolio case study.
+Before publishing, the notebook should be restarted and executed from beginning to end using the fixed random seed included in the analysis.
 
-Planned extensions may include a technical report, selected figures in the README, a lightweight Streamlit dashboard and an optional FastAPI inference endpoint.
+The main libraries used are:
 
-## Future work
+- pandas;
+- NumPy;
+- scikit-learn;
+- XGBoost;
+- Matplotlib;
+- KaggleHub.
 
-Possible future improvements include:
+# Project status
 
-* Refactoring the notebook into reusable training scripts
-* Saving and loading the final trained model
-* Adding a Streamlit dashboard for interactive exploration
-* Adding a FastAPI endpoint for model inference
-* Incorporating review text sentiment
-* Comparing model behavior across release years
-* Monitoring prediction errors by game genre, tag and popularity level
+The modeling pipeline, final notebook and technical report are complete.
 
-## Author
+# Potential extensions
 
-Stefano Triscali
+Future work could include:
+
+- incorporating review-text sentiment;
+- evaluating the model with a chronological train-test split;
+- adding developer and publisher reputation measures;
+- studying prediction errors across Genres, Tags and popularity levels;
+- investigating the relationship between niche positioning, product differentiation and the growing relevance of indie games on Steam.
+

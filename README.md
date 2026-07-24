@@ -236,3 +236,10 @@ Future work could include:
 - studying prediction errors across Genres, Tags and popularity levels;
 - investigating the relationship between niche positioning, product differentiation and the growing relevance of indie games on Steam.
 
+## Author
+
+**Stefano Triscali**
+
+## License
+
+This project is released under the [MIT License](LICENSE).

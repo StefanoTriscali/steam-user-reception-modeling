@@ -19,9 +19,9 @@ The final model is an XGBoost regressor trained using numerical metadata, Genres
 | Model | RMSE | MAE | R2 |
 |---|---:|---:|---:|
 | Dummy mean | 21.035 | 15.585 | 0.000 |
-| XGBoost - numerical only | 19.025 | 13.893 | 0.182 |
-| XGBoost + Genres/Categories | 17.974 | 13.115 | 0.270 |
-| Final XGBoost + Genres/Categories/Tags | **17.379** | **12.608** | **0.317** |
+| XGBoost - numerical only | 19.001 | 13.879 | 0.184 |
+| XGBoost + Genres/Categories | 17.956 | 13.105 | 0.271 |
+| Final XGBoost + Genres/Categories/Tags | **17.383** | **12.618** | **0.317** |
 
 Within the numerical-only comparison, XGBoost also achieved a lower cross-validated RMSE than Ridge and Lasso, supporting the use of a non-linear model for the subsequent feature-extension stages.
 

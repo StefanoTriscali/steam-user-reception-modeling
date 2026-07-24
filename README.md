@@ -1,15 +1,6 @@
----
-title: "Steam User Reception Modeling"
-author: "Stefano Triscali"
-date: "July 2026"
-geometry: margin=1in
-colorlinks: true
-linkcolor: blue
-urlcolor: blue
-toc: false
----
+# Steam User Reception Modeling
 
-# Overview
+## Overview
 
 This project investigates whether Steam game metadata, post-release engagement signals and multilabel categorical metadata can be used to predict user reception.
 
@@ -17,11 +8,11 @@ The analysis is framed as a supervised regression problem. The target is a Bayes
 
 > **Important:** this is a post-release reception modeling project, not a pre-release success forecasting model. Several predictors, including estimated ownership, playtime and Peak CCU, are observed only after release.
 
-# Research question
+## Research question
 
 > Can Steam game metadata and post-release engagement signals be used to predict user reception?
 
-# Main results
+## Main results
 
 The final model is an XGBoost regressor trained using numerical metadata, Genres, Categories and Steam Tags.
 
@@ -34,7 +25,7 @@ The final model is an XGBoost regressor trained using numerical metadata, Genres
 
 Within the numerical-only comparison, XGBoost also achieved a lower cross-validated RMSE than Ridge and Lasso, supporting the use of a non-linear model for the subsequent feature-extension stages.
 
-# Key findings
+## Key findings
 
 - Numerical post-release indicators contain meaningful predictive signal.
 - XGBoost outperforms the regularized linear baselines.
@@ -53,7 +44,7 @@ The Bayesian smoothing procedure reduces the concentration of extreme scores
 for games with very few reviews.
 
 <p align="center">
-  <img src="reports/figures/Raw_Vs_Bayesian_review_score_distr.png"
+  <img src="reports/figures/raw_vs_bayesian_review_score.png"
        alt="Raw and Bayesian-smoothed review score distributions"
        width="750">
 </p>
@@ -64,7 +55,7 @@ Permutation importance shows that the final model relies on both numerical
 post-release signals and multilabel metadata.
 
 <p align="center">
-  <img src="reports/figures/Top_20_permutation_importance_XGB.png"
+  <img src="reports/figures/permutation_importance.png"
        alt="Permutation importance"
        width="750">
 </p>
@@ -75,12 +66,12 @@ The model tends to overestimate poorly received games and underestimate highly
 received games.
 
 <p align="center">
-  <img src="reports/figures/error_by_quintile.png"
+  <img src="reports/figures/error_by_reception_quintile.png"
        alt="Mean signed error by reception quintile"
        width="750">
 </p>
 
-# Dataset
+## Dataset
 
 The project is based on the [Steam Games Dataset](https://www.kaggle.com/datasets/fronkongames/steam-games-dataset).
 
@@ -103,7 +94,7 @@ The dataset includes:
 
 The review-count variables are used exclusively to construct the target and are excluded from the predictive feature set to prevent target leakage.
 
-# Target construction
+## Target construction
 
 The raw review score is defined as:
 
@@ -121,7 +112,7 @@ The final regression target is:
 review_score_bayes
 ```
 
-# Methodology
+## Methodology
 
 The workflow consists of:
 
@@ -140,13 +131,13 @@ The workflow consists of:
 
 No model-selection, feature-selection or hyperparameter-selection decision is based on held-out test performance.
 
-# Model interpretation
+## Model interpretation
 
 Permutation importance is used to measure the increase in RMSE produced by shuffling each feature while leaving the remaining predictors unchanged.
 
 The results show that the final model uses both numerical engagement signals and multilabel metadata. The importance values should be interpreted as measures of predictive usefulness rather than causal effects.
 
-# Error analysis
+## Error analysis
 
 The model performs best around the central portion of the target distribution.
 
@@ -158,7 +149,7 @@ Mean signed prediction errors show a clear regression-to-the-mean pattern:
 
 This suggests that extreme reception may depend on qualitative or contextual information not represented in the structured dataset.
 
-# Limitations
+## Limitations
 
 - The analysis is predictive, not causal.
 - The model cannot be used for pre-release forecasting.
@@ -167,31 +158,35 @@ This suggests that extreme reception may depend on qualitative or contextual inf
 - Tags may reflect community perceptions and platform conventions rather than objective game characteristics.
 - The dataset does not include review text, bug reports, update history, marketing exposure, wishlist data, developer reputation or external community sentiment.
 
-# Repository structure
+## Repository structure
 
 ```text
 steam-user-reception-modeling/
-|-- notebooks/
-|   `-- steam_user_reception_modeling.ipynb
-|-- reports/
-|   |-- steam_user_reception_technical_report.pdf
-|   `-- figures/
-|       |-- raw_vs_bayesian_review_score.png
-|       |-- permutation_importance.png
-|       |-- predicted_vs_actual.png
-|       |-- error_by_reception_quintile.png
-|-- README.md
-|-- requirements.txt
-`-- .gitignore
+├── notebooks/
+│   └── steam_user_reception_modeling.ipynb
+├── reports/
+│   ├── steam_user_reception_technical_report.pdf
+│   └── figures/
+│       ├── raw_vs_bayesian_review_score.png
+│       ├── permutation_importance.png
+│       ├── predicted_vs_actual.png
+│       └── error_by_reception_quintile.png
+├── src/
+│   ├── features.py
+│   └── evaluation.py
+├── README.md
+├── requirements.txt
+├── LICENSE
+└── .gitignore
 ```
 
-# Technical report
+## Technical report
 
 The complete technical report is available here:
 
 [Read the technical report](reports/steam_user_reception_technical_report.pdf)
 
-# How to run
+## How to run
 
 Clone the repository and install the required packages:
 
@@ -209,9 +204,9 @@ notebooks/steam_user_reception_modeling.ipynb
 
 The notebook downloads the cleaned dataset through KaggleHub. Kaggle credentials may be required depending on the execution environment.
 
-# Reproducibility
+## Reproducibility
 
-Before publishing, the notebook should be restarted and executed from beginning to end using the fixed random seed included in the analysis.
+Before publishing, the notebook was restarted and executed from beginning to end using the fixed random seed included in the analysis.
 
 The main libraries used are:
 
@@ -222,11 +217,11 @@ The main libraries used are:
 - Matplotlib;
 - KaggleHub.
 
-# Project status
+## Project status
 
 The modeling pipeline, final notebook and technical report are complete.
 
-# Potential extensions
+## Potential extensions
 
 Future work could include:
 
@@ -236,10 +231,10 @@ Future work could include:
 - studying prediction errors across Genres, Tags and popularity levels;
 - investigating the relationship between niche positioning, product differentiation and the growing relevance of indie games on Steam.
 
-## Author
+### Author
 
 **Stefano Triscali**
 
-## License
+### License
 
 This project is released under the [MIT License](LICENSE).

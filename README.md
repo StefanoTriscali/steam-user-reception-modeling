@@ -1,5 +1,7 @@
 # Steam User Reception Modeling
 
+[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://steam-user-reception-modeling.streamlit.app/)
+
 ## Overview
 
 This project investigates whether Steam game metadata, post-release engagement signals and multilabel categorical metadata can be used to predict user reception.
@@ -7,6 +9,19 @@ This project investigates whether Steam game metadata, post-release engagement s
 The analysis is framed as a supervised regression problem. The target is a Bayesian-smoothed review reception score constructed from Steam positive and negative review counts.
 
 > **Important:** this is a post-release reception modeling project, not a pre-release success forecasting model. Several predictors, including estimated ownership, playtime and Peak CCU, are observed only after release.
+
+## Interactive application
+
+A lightweight interactive application is available on Streamlit Community Cloud:
+
+**[Launch the Steam User Reception Modeling app](https://steam-user-reception-modeling.streamlit.app/)**
+
+The application presents the project as a post-release analytical product rather than a pre-release forecasting tool. It includes four sections:
+
+- **Overview** — research question, project framing and headline findings;
+- **Game Explorer** — observed and predicted reception for individual games;
+- **Model Performance** — benchmark comparison, permutation importance and error analysis;
+- **Methodology & Limitations** — target construction, modeling workflow and interpretation boundaries.
 
 ## Research question
 
@@ -162,6 +177,19 @@ This suggests that extreme reception may depend on qualitative or contextual inf
 
 ```text
 steam-user-reception-modeling/
+├── app/
+│   ├── data/
+│   │   ├── error_by_quintile.csv
+│   │   ├── model_metrics.csv
+│   │   ├── permutation_importance.csv
+│   │   └── test_predictions.csv.gz
+│   ├── pages/
+│   │   ├── game_explorer.py
+│   │   ├── methodology.py
+│   │   ├── model_performance.py
+│   │   └── overview.py
+│   ├── export_app_data.py
+│   └── utils.py
 ├── notebooks/
 │   └── steam_user_reception_modeling.ipynb
 ├── reports/
@@ -172,12 +200,15 @@ steam-user-reception-modeling/
 │       ├── predicted_vs_actual.png
 │       └── error_by_reception_quintile.png
 ├── src/
-│   ├── features.py
-│   └── evaluation.py
-├── README.md
-├── requirements.txt
+│   ├── evaluation.py
+│   └── features.py
+├── .gitattributes
+├── .gitignore
 ├── LICENSE
-└── .gitignore
+├── README.md
+├── requirements-analysis.txt
+├── requirements.txt
+└── streamlit_app.py
 ```
 
 ## Technical report
@@ -188,27 +219,118 @@ The complete technical report is available here:
 
 ## How to run
 
-Clone the repository and install the required packages:
+The deployed Streamlit application is available at:
+
+**[Launch the Steam User Reception Modeling app](https://steam-user-reception-modeling.streamlit.app/)**
+
+The following instructions explain how to run the application or reproduce the modeling analysis locally.
+
+### 1. Clone the repository
 
 ```bash
 git clone https://github.com/StefanoTriscali/steam-user-reception-modeling.git
 cd steam-user-reception-modeling
-pip install -r requirements.txt
 ```
 
-Then open:
+### 2. Create a virtual environment
+
+Using an isolated Python environment is recommended to avoid dependency conflicts and restrictions imposed by system-managed Python installations.
+
+```bash
+python -m venv .venv
+```
+
+If `python` is not available on Linux or macOS, use `python3` instead:
+
+```bash
+python3 -m venv .venv
+```
+
+### 3. Activate the virtual environment
+
+Choose the command corresponding to your operating system and shell.
+
+**Linux or macOS — Bash/Zsh**
+
+```bash
+source .venv/bin/activate
+```
+
+**Linux or macOS — Fish**
+
+```fish
+source .venv/bin/activate.fish
+```
+
+**Windows — PowerShell**
+
+```powershell
+.venv\Scripts\Activate.ps1
+```
+
+**Windows — Command Prompt**
+
+```bat
+.venv\Scripts\activate.bat
+```
+
+After activation, the terminal prompt should display the name of the virtual environment.
+
+Upgrade pip inside the environment:
+
+```bash
+python -m pip install --upgrade pip
+```
+
+### 4A. Run the Streamlit application locally
+
+Install the lightweight application dependencies:
+
+```bash
+python -m pip install -r requirements.txt
+```
+
+Start the application:
+
+```bash
+python -m streamlit run streamlit_app.py
+```
+
+Streamlit will display the local application address in the terminal, typically:
 
 ```text
-notebooks/steam_user_reception_modeling.ipynb
+http://localhost:8501
+```
+
+### 4B. Reproduce the modeling analysis
+
+Install the complete analysis dependencies:
+
+```bash
+python -m pip install -r requirements-analysis.txt
+```
+
+Launch the final notebook:
+
+```bash
+python -m jupyter notebook notebooks/steam_user_reception_modeling.ipynb
 ```
 
 The notebook downloads the cleaned dataset through KaggleHub. Kaggle credentials may be required depending on the execution environment.
+
+### 5. Deactivate the environment
+
+When finished, close the application or notebook and deactivate the virtual environment:
+
+```bash
+deactivate
+```
 
 ## Reproducibility
 
 Before publishing, the notebook was restarted and executed from beginning to end using the fixed random seed included in the analysis.
 
-The main libraries used are:
+The main libraries used for the modeling analysis are:
 
 - pandas;
 - NumPy;
@@ -217,9 +339,14 @@ The main libraries used are:
 - Matplotlib;
 - KaggleHub.
 
+The interactive application is built with:
+
+- Streamlit;
+- Plotly.
+
 ## Project status
 
-The modeling pipeline, final notebook and technical report are complete.
+The modeling pipeline, final notebook, technical report and interactive Streamlit application are complete.
 
 ## Potential extensions
 

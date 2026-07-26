@@ -32,3 +32,10 @@ data/
 # Secrets
 .env
 kaggle.json
+
+# Streamlit application artifacts
+!app/data/
+!app/data/test_predictions.csv.gz
+!app/data/model_metrics.csv
+!app/data/permutation_importance.csv
+!app/data/error_by_quintile.csv

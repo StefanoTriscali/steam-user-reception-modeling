@@ -487,7 +487,7 @@ with resources_tab:
         icon="📄",
     )
 
-            st.link_button(
+    st.link_button(
         "Read the industry report",
         (
             "https://github.com/StefanoTriscali/"

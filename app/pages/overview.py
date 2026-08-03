@@ -185,6 +185,7 @@ st.markdown(
     """
     - [GitHub repository](https://github.com/StefanoTriscali/steam-user-reception-modeling)
     - [Technical report](https://github.com/StefanoTriscali/steam-user-reception-modeling/blob/main/reports/steam_user_reception_technical_report.pdf)
+    - [Industry report](https://github.com/StefanoTriscali/steam-user-reception-modeling/blob/main/reports/steam_user_reception_industry_report.pdf)
     - [Cleaned dataset on Kaggle](https://www.kaggle.com/datasets/stefanotriscali/steam-database-2026-fixed)
     """
 )

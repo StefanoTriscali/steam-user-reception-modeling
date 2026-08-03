@@ -487,6 +487,16 @@ with resources_tab:
         icon="📄",
     )
 
+            st.link_button(
+        "Read the industry report",
+        (
+            "https://github.com/StefanoTriscali/"
+            "steam-user-reception-modeling/blob/main/"
+            "reports/steam_user_reception_industry_report.pdf"
+        ),
+        icon="👾",
+    )
+
     st.link_button(
         "Open the GitHub repository",
         (

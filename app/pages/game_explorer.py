@@ -29,7 +29,6 @@ except (FileNotFoundError, ValueError) as error:
     st.error(str(error))
     st.stop()
 
-
 # ---------------------------------------------------------
 # Prepare game labels
 # ---------------------------------------------------------
@@ -72,16 +71,102 @@ predictions = predictions.sort_values(
     key=lambda series: series.str.lower(),
 )
 
+# ---------------------------------------------------------
+# Prepare case studies and selection
+# ---------------------------------------------------------
 
-# ---------------------------------------------------------
-# Selection
-# ---------------------------------------------------------
+display_options = predictions["display_name"].tolist()
+
+
+def find_display_name(game_name: str) -> str | None:
+    matches = predictions.loc[
+        predictions["game_name"].eq(game_name),
+        "display_name",
+    ]
+
+    if matches.empty:
+        return None
+
+    return matches.iloc[0]
+
+
+case_studies = {
+    "Battlefront": find_display_name(
+        "STAR WARS™: Battlefront Classic Collection"
+    ),
+    "Command & Conquer 4": find_display_name(
+        "Command & Conquer™ 4 Tiberian Twilight"
+    ),
+    "The Walking Dead": find_display_name(
+        "The Walking Dead: The Final Season"
+    ),
+    "WEBFISHING": find_display_name(
+        "WEBFISHING"
+    ),
+}
+
+
+def select_case(display_name: str) -> None:
+    st.session_state["game_selector"] = display_name
+
+
+# Remove an invalid selection if the underlying data changes
+if (
+    "game_selector" in st.session_state
+    and st.session_state["game_selector"] not in display_options
+):
+    del st.session_state["game_selector"]
+
+
+with st.expander("Try an exceptional prediction case"):
+    st.caption(
+        "These examples show games whose reception was substantially "
+        "overestimated or underestimated by the model."
+    )
+
+    col1, col2 = st.columns(2)
+
+    col1.button(
+        "Overestimated · Battlefront",
+        use_container_width=True,
+        disabled=case_studies["Battlefront"] is None,
+        on_click=select_case,
+        args=(case_studies["Battlefront"],),
+    )
+
+    col2.button(
+        "Overestimated · Command & Conquer 4",
+        use_container_width=True,
+        disabled=case_studies["Command & Conquer 4"] is None,
+        on_click=select_case,
+        args=(case_studies["Command & Conquer 4"],),
+    )
+
+    col3, col4 = st.columns(2)
+
+    col3.button(
+        "Underestimated · The Walking Dead",
+        use_container_width=True,
+        disabled=case_studies["The Walking Dead"] is None,
+        on_click=select_case,
+        args=(case_studies["The Walking Dead"],),
+    )
+
+    col4.button(
+        "Underestimated · WEBFISHING",
+        use_container_width=True,
+        disabled=case_studies["WEBFISHING"] is None,
+        on_click=select_case,
+        args=(case_studies["WEBFISHING"],),
+    )
+
 
 selected_label = st.selectbox(
     "Search for a game",
-    options=predictions["display_name"].tolist(),
+    options=display_options,
     index=None,
     placeholder="Type a game title...",
+    key="game_selector",
 )
 
 
@@ -188,7 +273,7 @@ with chart_column:
         yaxis_title="Reception score",
         yaxis_range=[
             min(-10, actual_score - 15, predicted_score - 15),
-            min(100, max(actual_score, predicted_score) + 15),
+            max(10, actual_score + 15, predicted_score + 15),
         ],
         showlegend=False,
         height=380,

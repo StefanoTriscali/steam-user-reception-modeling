@@ -194,6 +194,7 @@ steam-user-reception-modeling/
 │   └── steam_user_reception_modeling.ipynb
 ├── reports/
 │   ├── steam_user_reception_technical_report.pdf
+│   ├── steam_user_reception_industry_report.pdf  
 │   └── figures/
 │       ├── raw_vs_bayesian_review_score.png
 │       ├── permutation_importance.png
@@ -211,11 +212,12 @@ steam-user-reception-modeling/
 └── streamlit_app.py
 ```
 
-## Technical report
+## Reports
 
-The complete technical report is available here:
+The project is documented through two complementary reports:
 
-[Read the technical report](reports/steam_user_reception_technical_report.pdf)
+- [Industry Report](reports/industry_report.pdf) — a concise, non-technical discussion of the main findings, practical applications, and limitations.
+- [Technical Report](reports/technical_report.pdf) — a detailed description of data preparation, feature engineering, model development, validation, and results.
 
 ## How to run
 
@@ -346,7 +348,7 @@ The interactive application is built with:
 
 ## Project status
 
-The modeling pipeline, final notebook, technical report and interactive Streamlit application are complete.
+The modeling pipeline, final notebook, technical and industry reports and interactive Streamlit application are complete.
 
 ## Potential extensions
 

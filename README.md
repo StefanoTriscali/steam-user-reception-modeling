@@ -216,8 +216,8 @@ steam-user-reception-modeling/
 
 The project is documented through two complementary reports:
 
-- [Industry Report](reports/industry_report.pdf) — a concise, non-technical discussion of the main findings, practical applications, and limitations.
-- [Technical Report](reports/technical_report.pdf) — a detailed description of data preparation, feature engineering, model development, validation, and results.
+- [Industry Report](reports/steam_user_reception_industry_report.pdf) — a concise, non-technical discussion of the main findings, practical applications, and limitations.
+- [Technical Report](reports/steam_user_reception_technical_report.pdf) — a detailed description of data preparation, feature engineering, model development, validation, and results.
 
 ## How to run
 
